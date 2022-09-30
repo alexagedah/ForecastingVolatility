@@ -1,16 +1,24 @@
-# Forecasting Volatility 
-Comparing the performance of the GARCH(1,1) model and historical volatility, close-to-close volatility, Parkinson volatility, Garman-Klass volatility and Rogers-Satchell volatility in the rolling window method to forecast future volatility on the Nasdaq composite.
+# Forecasting Volatility
+Forecasting volatility is key to trading volatility succesfully. If an option trader can forecast volatility more accurately than the market, they can profit from the difference between realised volatility and implied volatility. The aim of this project was to compare the performance of different methods used to forecast volatility. The two methods explored were the GARCH(1,1) model and rolling window method. In the rolling window method, the estimators used to estimate true volatility were 
+- historical volatility
+- close-to-close volatility
+- Parkinson volatility
+- Garman-Klass volatility
+- Rogers-Satchell volatility
+The forecasts were done on the Nasdaq composite however this can easily be changed to any other asset class.
 
-Volatility exhibits serial correlation. Future volatility over some period of time is correlated to volatility over the previous period of time when both periods of time are the same. This is the basis on which the rolling window method for forecasting future volatility is built. Here the rolling window method is used to forecast future volatility and different estimators are used to estimate true volatility. Comparisons are then made in the performance of the different estimators. This is repeated for various forecast periods.
+# Method, Results and Discussion
+The R squared statistic was used to measure the performance of the methods. They produced predicted values of  future realised volatility over the next x days these were compared with the actual value of future realised volatility over the next x days. Below are the results showing the R squared statistics for when the rolling window method was used with different estimators.
 
-Going into this, I expect the close-to-close method to perform the best in the rolling window method. Despite its low efficiency it is an unbiased estimator of true volatility whereas the Parkinson and Garmana-Klass estimators are biased. The Rogers-Satchell estimator is unbiased, however it performs badly when there are gaps. Future investigations on cryptocurrencies would be interesting as these rarely have gaps.
+<img width="622" alt="Screenshot 2022-09-30 at 03 03 17" src="https://user-images.githubusercontent.com/108612856/193174305-62cd9093-eaeb-4882-88c7-208d6c3403b8.png">
 
-# Performance
-The GARCH(1,1) model performed very badly in forecasting volatility. The NASDAQ data was split into a training set to estimate the parameters for the model using the MLE method, and then tested on a training set. The R squared was -1.5! Causes for such a bad R squared are
-- A bug. I need to go through my code and make sure there are no errors
-- Poor model assumptions. We are assuming the parameteers for the model are constant over 22 years. This is not a good assumption to be making. It may be best to use a rolling window ot estimate the parameters for the model
+The rolling window method performed best when forecasting volatility over the next 10 days. For more days than this, performance declined and was particularly poor when using periods over 100 days. This is likely because when there is a large move in the asset, this moves remains in the forecast for x days and then suddenly drops out. Equity indices often experience spikes in volatility which then decay with time and so the rolling window method would perform badly for x days after a large spike in volatility.
+
+The GARCH(1,1) model was used to forecast volatility over the next 20 days. The NASDAQ data was split into a training set to estimate the parameters for the model using the MLE method, and then tested on a training set. The scipy.optimise module was used to maximise the likelihood function. The R squared for the GARCH(1,1) R squared was -1.5! This is a very bad R squared and there are various possible reasons for it
+- A bug in the code (I need to go through my code and make sure there are no errors)
+- The scipy.optimise module is not estimating the MLE parameters. The parameters it gave were quite different from the parameters from the Hull book example so the optimisation procedure needs to be investigated
+- Poor model. The GARCH(1,1) model may be a poor model (look into research on the model and see what other results are)
 - Non-optimal forecast period. I only tested the model forecasting volatility over the next 20 days. Is there a better period that the GARCH model works for? If so, why is this true?
 
-The rolling window method performed best when forecasting volatility over the next 10 days. For more days than this, performance declinde and was particularly poor when using periods over 100 days. Below are the R squared statistics for the rolling window method when forecasting over various periods of time
-
-<img width="949" alt="Screenshot 2022-09-28 at 13 36 31" src="https://user-images.githubusercontent.com/108612856/192780165-63a291d9-a99b-4004-b8ec-f09f7d517782.png">
+# Conclusion
+This serves is a good introduction to forecasting volatility. The next steps are to tweak the code to make a full framework which can be used to assess methods for forecasting volatility, save the results and make comparisons to other methods.
